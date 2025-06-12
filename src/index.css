@@ -1,94 +1,50 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
+/* YouTube-like dark theme design system */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 15 15 15; /* YouTube dark bg #0F0F0F */
+    --foreground: 255 255 255; /* White text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 31 31 31; /* YouTube card bg #1F1F1F */
+    --card-foreground: 255 255 255;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 31 31 31;
+    --popover-foreground: 255 255 255;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 255 0 0; /* YouTube red */
+    --primary-foreground: 255 255 255;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 39 39 39; /* YouTube hover bg #272727 */
+    --secondary-foreground: 255 255 255;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 39 39 39;
+    --muted-foreground: 170 170 170; /* YouTube secondary text #AAAAAA */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 39 39 39;
+    --accent-foreground: 255 255 255;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 39 39 39;
+    --input: 39 39 39;
+    --ring: 255 0 0;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 31 31 31;
+    --sidebar-foreground: 255 255 255;
+    --sidebar-primary: 255 0 0;
+    --sidebar-primary-foreground: 255 255 255;
+    --sidebar-accent: 39 39 39;
+    --sidebar-accent-foreground: 255 255 255;
+    --sidebar-border: 39 39 39;
+    --sidebar-ring: 255 0 0;
   }
 }
 
@@ -98,6 +54,42 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-youtube-dark-bg text-youtube-text-primary font-sans;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Custom scrollbar for YouTube-like feel */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-youtube-dark-bg;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-youtube-card-bg rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-youtube-hover-bg;
+  }
+}
+
+@layer components {
+  .video-card {
+    @apply bg-youtube-card-bg rounded-lg overflow-hidden transition-all duration-200 hover:bg-youtube-hover-bg cursor-pointer;
+  }
+
+  .video-thumbnail {
+    @apply w-full aspect-video object-cover;
+  }
+
+  .btn-youtube {
+    @apply bg-youtube-red hover:bg-red-600 text-white px-6 py-2 rounded-full font-medium transition-colors duration-200;
+  }
+
+  .btn-youtube-secondary {
+    @apply bg-youtube-card-bg hover:bg-youtube-hover-bg text-white px-6 py-2 rounded-full font-medium transition-colors duration-200;
   }
 }
