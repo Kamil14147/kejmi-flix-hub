@@ -24,7 +24,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen bg-youtube-dark-bg">
+          <div className="min-h-screen bg-white">
             <Navbar />
             <main className="pt-16">
               <Routes>
