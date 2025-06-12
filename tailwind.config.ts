@@ -64,7 +64,12 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				youtube: {
-					red: '#FF0000'
+					red: '#FF0000',
+					'dark-bg': '#0F0F0F',
+					'card-bg': '#1F1F1F',
+					'hover-bg': '#272727',
+					'text-primary': '#FFFFFF',
+					'text-secondary': '#AAAAAA'
 				}
 			},
 			borderRadius: {

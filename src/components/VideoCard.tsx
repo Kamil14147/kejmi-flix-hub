@@ -71,13 +71,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, className = '' }) => {
 
             {/* Video Details */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-gray-900 font-medium text-sm line-clamp-2 group-hover:text-gray-600 transition-colors">
+              <h3 className="text-white font-medium text-sm line-clamp-2 group-hover:text-youtube-text-secondary transition-colors">
                 {video.title}
               </h3>
-              <p className="text-gray-600 text-xs mt-1">
+              <p className="text-youtube-text-secondary text-xs mt-1">
                 {video.uploaded_by}
               </p>
-              <div className="flex items-center space-x-2 text-gray-600 text-xs mt-1">
+              <div className="flex items-center space-x-2 text-youtube-text-secondary text-xs mt-1">
                 <div className="flex items-center space-x-1">
                   <Eye className="w-3 h-3" />
                   <span>{formatViews(video.views)} wyświetleń</span>
