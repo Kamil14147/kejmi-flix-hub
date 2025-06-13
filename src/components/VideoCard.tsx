@@ -12,10 +12,14 @@ interface Video {
   category: string;
   video_url: string;
   thumbnail_url: string;
-  uploaded_by: string;
-  upload_date: string;
+  user_id: string;
   views: number;
-  author_avatar?: string;
+  created_at: string;
+  updated_at: string;
+  profiles?: {
+    username: string;
+    avatar_url?: string;
+  };
 }
 
 interface VideoCardProps {
@@ -33,10 +37,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, className = '' }) => {
     return views.toString();
   };
 
-  const timeAgo = formatDistanceToNow(new Date(video.upload_date), {
+  const timeAgo = formatDistanceToNow(new Date(video.created_at), {
     addSuffix: true,
     locale: pl
   });
+
+  const authorName = video.profiles?.username || 'Unknown User';
+  const authorAvatar = video.profiles?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${authorName}`;
 
   return (
     <Link to={`/video/${video.id}`} className={`block ${className}`}>
@@ -44,7 +51,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, className = '' }) => {
         {/* Thumbnail */}
         <div className="relative">
           <img
-            src={video.thumbnail_url}
+            src={video.thumbnail_url || '/placeholder.svg'}
             alt={video.title}
             className="video-thumbnail"
             loading="lazy"
@@ -63,8 +70,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, className = '' }) => {
             {/* Author Avatar */}
             <div className="flex-shrink-0">
               <img
-                src={video.author_avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${video.uploaded_by}`}
-                alt={video.uploaded_by}
+                src={authorAvatar}
+                alt={authorName}
                 className="w-9 h-9 rounded-full"
               />
             </div>
@@ -75,7 +82,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, className = '' }) => {
                 {video.title}
               </h3>
               <p className="text-youtube-text-secondary text-xs mt-1">
-                {video.uploaded_by}
+                {authorName}
               </p>
               <div className="flex items-center space-x-2 text-youtube-text-secondary text-xs mt-1">
                 <div className="flex items-center space-x-1">

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Video, Loader2 } from 'lucide-react';
+import { Video, Loader2, Mail } from 'lucide-react';
 
 const Register = () => {
   const { register, isLoading } = useAuth();
@@ -20,6 +20,8 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
+
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -58,22 +60,61 @@ const Register = () => {
       return;
     }
 
+    // Validate username (alphanumeric + underscores only)
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      toast({
+        title: "Błąd",
+        description: "Nazwa użytkownika może zawierać tylko litery, cyfry i podkreślenia",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const success = await register(formData.email, formData.password, formData.username);
     
     if (success) {
+      setIsRegistered(true);
       toast({
-        title: "Konto utworzone pomyślnie",
-        description: "Witaj w Kejmiltube!",
+        title: "Rejestracja pomyślna",
+        description: "Sprawdź swoją skrzynkę email, aby potwierdzić konto",
       });
-      navigate('/');
     } else {
       toast({
         title: "Błąd rejestracji",
-        description: "Spróbuj ponownie",
+        description: "Użytkownik o podanym emailu już istnieje lub wystąpił inny błąd",
         variant: "destructive",
       });
     }
   };
+
+  if (isRegistered) {
+    return (
+      <div className="min-h-screen bg-youtube-dark-bg flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <Card className="bg-youtube-card-bg border-youtube-hover-bg">
+            <CardHeader className="text-center">
+              <Mail className="w-16 h-16 text-youtube-red mx-auto mb-4" />
+              <CardTitle className="text-2xl text-white">Sprawdź swoją skrzynkę</CardTitle>
+              <CardDescription className="text-youtube-text-secondary">
+                Wysłaliśmy link aktywacyjny na adres <strong>{formData.email}</strong>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-youtube-text-secondary text-sm text-center">
+                Kliknij w link w emailu, aby aktywować swoje konto, a następnie zaloguj się.
+              </p>
+              <Button
+                onClick={() => navigate('/login')}
+                className="w-full btn-youtube"
+              >
+                Przejdź do logowania
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-youtube-dark-bg flex items-center justify-center px-4">

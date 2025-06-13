@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { User, Save, Camera } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -22,6 +24,30 @@ const Profile = () => {
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch user's video statistics
+  const { data: videoStats } = useQuery({
+    queryKey: ['userVideoStats', user?.id],
+    queryFn: async () => {
+      if (!user) return { videoCount: 0, totalViews: 0 };
+      
+      const { data: videos, error } = await supabase
+        .from('videos')
+        .select('views')
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error fetching video stats:', error);
+        return { videoCount: 0, totalViews: 0 };
+      }
+
+      const videoCount = videos.length;
+      const totalViews = videos.reduce((sum, video) => sum + video.views, 0);
+
+      return { videoCount, totalViews };
+    },
+    enabled: !!user,
+  });
 
   // Redirect if not logged in
   React.useEffect(() => {
@@ -38,18 +64,38 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    if (!user) return;
+
+    // Validate username
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      toast({
+        title: "Błąd",
+        description: "Nazwa użytkownika może zawierać tylko litery, cyfry i podkreślenia",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     
     try {
-      // In a real app, this would update the user in Supabase
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Profil zaktualizowany",
-        description: "Twoje dane zostały pomyślnie zapisane",
+      const success = await updateProfile({
+        username: formData.username.trim(),
       });
       
-      setIsEditing(false);
+      if (success) {
+        toast({
+          title: "Profil zaktualizowany",
+          description: "Twoje dane zostały pomyślnie zapisane",
+        });
+        setIsEditing(false);
+      } else {
+        toast({
+          title: "Błąd",
+          description: "Nie udało się zaktualizować profilu. Nazwa użytkownika może być już zajęta.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Błąd",
@@ -134,10 +180,12 @@ const Profile = () => {
                   name="email"
                   type="email"
                   value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={!isEditing}
-                  className="bg-youtube-hover-bg border-youtube-hover-bg text-white disabled:opacity-60 focus:border-youtube-red"
+                  disabled={true}
+                  className="bg-youtube-hover-bg border-youtube-hover-bg text-white disabled:opacity-60"
                 />
+                <p className="text-youtube-text-secondary text-xs">
+                  Email nie może być zmieniony
+                </p>
               </div>
 
               {/* Account Stats */}
@@ -145,11 +193,15 @@ const Profile = () => {
                 <h3 className="text-white font-medium mb-3">Statystyki konta</h3>
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-youtube-red">0</div>
+                    <div className="text-2xl font-bold text-youtube-red">
+                      {videoStats?.videoCount || 0}
+                    </div>
                     <div className="text-youtube-text-secondary text-sm">Filmów</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-youtube-red">0</div>
+                    <div className="text-2xl font-bold text-youtube-red">
+                      {videoStats?.totalViews || 0}
+                    </div>
                     <div className="text-youtube-text-secondary text-sm">Wyświetleń</div>
                   </div>
                 </div>

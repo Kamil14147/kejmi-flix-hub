@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,9 +21,9 @@ const Upload = () => {
     title: '',
     description: '',
     category: '',
+    video_url: '',
   });
   
-  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -55,33 +56,6 @@ const Upload = () => {
     });
   };
 
-  const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Check file size (limit to 100MB for demo)
-      if (file.size > 100 * 1024 * 1024) {
-        toast({
-          title: "Plik za duży",
-          description: "Maksymalny rozmiar pliku to 100MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Check file type
-      if (!file.type.startsWith('video/')) {
-        toast({
-          title: "Nieprawidłowy format",
-          description: "Wybierz plik wideo",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setVideoFile(file);
-    }
-  };
-
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -99,13 +73,46 @@ const Upload = () => {
     }
   };
 
+  const validateYouTubeUrl = (url: string): boolean => {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+/;
+    return youtubeRegex.test(url);
+  };
+
+  const extractThumbnailFromUrl = (url: string): string => {
+    // Extract video ID from YouTube URL and return thumbnail URL
+    const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/;
+    const match = url.match(regex);
+    if (match) {
+      return `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`;
+    }
+    return '/placeholder.svg';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.description || !formData.category || !videoFile) {
+    if (!formData.title || !formData.description || !formData.category || !formData.video_url) {
       toast({
         title: "Błąd",
-        description: "Wypełnij wszystkie wymagane pola i wybierz plik wideo",
+        description: "Wypełnij wszystkie wymagane pola",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateYouTubeUrl(formData.video_url)) {
+      toast({
+        title: "Błąd",
+        description: "Podaj poprawny link do YouTube",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Błąd",
+        description: "Musisz być zalogowany aby dodać film",
         variant: "destructive",
       });
       return;
@@ -114,26 +121,54 @@ const Upload = () => {
     setIsUploading(true);
 
     try {
-      // In a real app, this would upload to Cloudinary/Firebase Storage
-      // and save metadata to Supabase database
-      
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
+      let thumbnailUrl = extractThumbnailFromUrl(formData.video_url);
+
+      // If user uploaded custom thumbnail, we would upload it to Supabase Storage here
+      // For now, we'll use the YouTube thumbnail or placeholder
+      if (thumbnailFile) {
+        // In a production app, upload to Supabase Storage
+        thumbnailUrl = URL.createObjectURL(thumbnailFile);
+      }
+
+      const { data, error } = await supabase
+        .from('videos')
+        .insert([
+          {
+            title: formData.title.trim(),
+            description: formData.description.trim(),
+            category: formData.category,
+            video_url: formData.video_url.trim(),
+            thumbnail_url: thumbnailUrl,
+            user_id: user.id,
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Upload error:', error);
+        toast({
+          title: "Błąd podczas zapisywania",
+          description: "Spróbuj ponownie",
+          variant: "destructive",
+        });
+        return;
+      }
+
       toast({
-        title: "Film wysłany pomyślnie!",
-        description: "Twój film jest już dostępny na platformie",
+        title: "Film został dodany!",
+        description: "Twój film jest teraz dostępny na platformie",
       });
       
       // Reset form
-      setFormData({ title: '', description: '', category: '' });
-      setVideoFile(null);
+      setFormData({ title: '', description: '', category: '', video_url: '' });
       setThumbnailFile(null);
       
-      // Redirect to home page
-      navigate('/');
+      // Redirect to the new video
+      navigate(`/video/${data.id}`);
       
     } catch (error) {
+      console.error('Upload error:', error);
       toast({
         title: "Błąd podczas wysyłania",
         description: "Spróbuj ponownie",
@@ -163,52 +198,23 @@ const Upload = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Video Upload */}
+              {/* Video URL */}
               <div className="space-y-2">
-                <Label className="text-white text-lg">Plik wideo *</Label>
-                <div className="border-2 border-dashed border-youtube-hover-bg rounded-lg p-8 text-center">
-                  {videoFile ? (
-                    <div className="space-y-2">
-                      <Video className="w-12 h-12 text-youtube-red mx-auto" />
-                      <p className="text-white font-medium">{videoFile.name}</p>
-                      <p className="text-youtube-text-secondary text-sm">
-                        {(videoFile.size / 1024 / 1024).toFixed(2)} MB
-                      </p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setVideoFile(null)}
-                        className="text-youtube-text-secondary hover:text-white"
-                      >
-                        Usuń plik
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <UploadIcon className="w-16 h-16 text-youtube-text-secondary mx-auto" />
-                      <div>
-                        <p className="text-white text-lg mb-2">Wybierz plik wideo do przesłania</p>
-                        <p className="text-youtube-text-secondary text-sm mb-4">
-                          Obsługiwane formaty: MP4, AVI, MOV, WMV (max. 100MB)
-                        </p>
-                        <Input
-                          type="file"
-                          accept="video/*"
-                          onChange={handleVideoFileChange}
-                          className="hidden"
-                          id="video-upload"
-                        />
-                        <Label
-                          htmlFor="video-upload"
-                          className="btn-youtube cursor-pointer inline-flex items-center space-x-2"
-                        >
-                          <UploadIcon className="w-4 h-4" />
-                          <span>Wybierz plik</span>
-                        </Label>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <Label htmlFor="video_url" className="text-white">
+                  Link do filmu (YouTube) *
+                </Label>
+                <Input
+                  id="video_url"
+                  name="video_url"
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  value={formData.video_url}
+                  onChange={handleInputChange}
+                  className="bg-youtube-hover-bg border-youtube-hover-bg text-white placeholder:text-youtube-text-secondary focus:border-youtube-red"
+                  required
+                />
+                <p className="text-youtube-text-secondary text-xs">
+                  Wklej link do filmu na YouTube
+                </p>
               </div>
 
               {/* Thumbnail Upload */}
@@ -237,6 +243,9 @@ const Upload = () => {
                   ) : (
                     <div className="text-center">
                       <Image className="w-8 h-8 text-youtube-text-secondary mx-auto mb-2" />
+                      <p className="text-youtube-text-secondary text-sm mb-2">
+                        Zostanie użyta miniaturka z YouTube lub możesz dodać własną
+                      </p>
                       <Input
                         type="file"
                         accept="image/*"
@@ -249,7 +258,7 @@ const Upload = () => {
                         className="btn-youtube-secondary cursor-pointer inline-flex items-center space-x-2"
                       >
                         <UploadIcon className="w-4 h-4" />
-                        <span>Dodaj miniaturkę</span>
+                        <span>Dodaj własną miniaturkę</span>
                       </Label>
                     </div>
                   )}
@@ -319,7 +328,7 @@ const Upload = () => {
                   {isUploading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Przesyłanie filmu...
+                      Zapisywanie filmu...
                     </>
                   ) : (
                     <>
