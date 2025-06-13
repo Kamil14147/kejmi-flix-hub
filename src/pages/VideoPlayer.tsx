@@ -7,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { Eye, ThumbsUp, ThumbsDown, Share2, Download, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useVideoSecurity } from '@/hooks/useVideoSecurity';
 
 // Mock video data - updated to match the Video interface
 const mockVideos = [
@@ -64,6 +65,7 @@ const VideoPlayer = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { secureViewIncrement } = useVideoSecurity();
   const [video, setVideo] = useState<any>(null);
   const [suggestedVideos, setSuggestedVideos] = useState(mockVideos);
   const [isLiked, setIsLiked] = useState(false);
@@ -74,15 +76,18 @@ const VideoPlayer = () => {
     const foundVideo = mockVideos.find(v => v.id === id);
     if (foundVideo) {
       setVideo(foundVideo);
-      // Increment view count in real app
-      console.log(`Viewing video: ${foundVideo.title}`);
+      
+      // Securely increment view count
+      if (id) {
+        secureViewIncrement(id);
+      }
       
       // Set suggested videos (exclude current video)
       setSuggestedVideos(mockVideos.filter(v => v.id !== id));
     } else {
       navigate('/');
     }
-  }, [id, navigate]);
+  }, [id, navigate, secureViewIncrement]);
 
   const formatViews = (views: number) => {
     if (views >= 1000000) {
@@ -108,10 +113,18 @@ const VideoPlayer = () => {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link skopiowany do schowka",
-      duration: 2000,
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast({
+        title: "Link skopiowany do schowka",
+        duration: 2000,
+      });
+    }).catch(() => {
+      toast({
+        title: "Nie udało się skopiować linku",
+        variant: "destructive",
+        duration: 2000,
+      });
     });
   };
 

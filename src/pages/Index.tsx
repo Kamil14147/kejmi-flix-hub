@@ -117,12 +117,13 @@ const Index = () => {
   useEffect(() => {
     let filtered = [...videos];
 
-    // Apply search filter
+    // Apply search filter with XSS protection
     if (searchQuery) {
+      const sanitizedQuery = searchQuery.replace(/<[^>]*>/g, '').toLowerCase();
       filtered = filtered.filter(video =>
-        video.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        video.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        video.category.toLowerCase().includes(searchQuery.toLowerCase())
+        video.title.toLowerCase().includes(sanitizedQuery) ||
+        video.description.toLowerCase().includes(sanitizedQuery) ||
+        video.category.toLowerCase().includes(sanitizedQuery)
       );
     }
 
@@ -132,14 +133,14 @@ const Index = () => {
         filtered = filtered.sort((a, b) => b.views - a.views);
         break;
       case 'recent':
-        filtered = filtered.sort((a, b) => new Date(b.upload_date).getTime() - new Date(a.upload_date).getTime());
+        filtered = filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
       case 'recommended':
       default:
         // Mix of views and recency for recommendations
         filtered = filtered.sort((a, b) => {
-          const scoreA = a.views * 0.7 + (new Date(a.upload_date).getTime() / 1000000) * 0.3;
-          const scoreB = b.views * 0.7 + (new Date(b.upload_date).getTime() / 1000000) * 0.3;
+          const scoreA = a.views * 0.7 + (new Date(a.created_at).getTime() / 1000000) * 0.3;
+          const scoreB = b.views * 0.7 + (new Date(b.created_at).getTime() / 1000000) * 0.3;
           return scoreB - scoreA;
         });
         break;
@@ -154,7 +155,7 @@ const Index = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            {searchQuery ? `Wyniki wyszukiwania: "${searchQuery}"` : 'Kejmiltube'}
+            {searchQuery ? `Wyniki wyszukiwania: "${searchQuery.replace(/<[^>]*>/g, '')}"` : 'Kejmiltube'}
           </h1>
           <p className="text-youtube-text-secondary">
             {searchQuery ? `Znaleziono ${filteredVideos.length} filmów` : 'Odkryj najlepsze filmy na platformie'}

@@ -170,6 +170,10 @@ export type Database = {
         Args: { video_id: string }
         Returns: undefined
       }
+      increment_video_views_safe: {
+        Args: { video_id: string; user_ip?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
