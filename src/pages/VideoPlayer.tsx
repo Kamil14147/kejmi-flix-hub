@@ -8,7 +8,7 @@ import { pl } from 'date-fns/locale';
 import { Eye, ThumbsUp, ThumbsDown, Share2, Download, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Mock video data - same as in Index.tsx
+// Mock video data - updated to match the Video interface
 const mockVideos = [
   {
     id: '1',
@@ -17,10 +17,14 @@ const mockVideos = [
     category: 'Edukacja',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=225&fit=crop',
-    uploaded_by: 'CodeMaster',
-    upload_date: '2024-01-15T10:00:00Z',
+    user_id: 'user-1',
     views: 15420,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CodeMaster'
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    profiles: {
+      username: 'CodeMaster',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CodeMaster'
+    }
   },
   {
     id: '2',
@@ -29,10 +33,14 @@ const mockVideos = [
     category: 'Technologia',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop',
-    uploaded_by: 'WebDev Pro',
-    upload_date: '2024-01-14T15:30:00Z',
+    user_id: 'user-2',
     views: 8932,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WebDevPro'
+    created_at: '2024-01-14T15:30:00Z',
+    updated_at: '2024-01-14T15:30:00Z',
+    profiles: {
+      username: 'WebDev Pro',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WebDevPro'
+    }
   },
   {
     id: '3',
@@ -41,10 +49,14 @@ const mockVideos = [
     category: 'Mobile',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=225&fit=crop',
-    uploaded_by: 'MobileDev',
-    upload_date: '2024-01-13T09:15:00Z',
+    user_id: 'user-3',
     views: 12856,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MobileDev'
+    created_at: '2024-01-13T09:15:00Z',
+    updated_at: '2024-01-13T09:15:00Z',
+    profiles: {
+      username: 'MobileDev',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MobileDev'
+    }
   }
 ];
 
@@ -111,7 +123,7 @@ const VideoPlayer = () => {
     );
   }
 
-  const timeAgo = formatDistanceToNow(new Date(video.upload_date), {
+  const timeAgo = formatDistanceToNow(new Date(video.created_at), {
     addSuffix: true,
     locale: pl
   });
@@ -194,12 +206,12 @@ const VideoPlayer = () => {
               {/* Author Info */}
               <div className="flex items-start space-x-4 bg-youtube-card-bg p-4 rounded-lg">
                 <img
-                  src={video.author_avatar}
-                  alt={video.uploaded_by}
+                  src={video.profiles?.avatar_url}
+                  alt={video.profiles?.username}
                   className="w-12 h-12 rounded-full"
                 />
                 <div className="flex-1">
-                  <h3 className="text-white font-medium text-lg">{video.uploaded_by}</h3>
+                  <h3 className="text-white font-medium text-lg">{video.profiles?.username}</h3>
                   <p className="text-youtube-text-secondary text-sm mt-2 leading-relaxed">
                     {video.description}
                   </p>

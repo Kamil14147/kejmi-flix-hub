@@ -15,10 +15,14 @@ const mockVideos = [
     category: 'Edukacja',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=225&fit=crop',
-    uploaded_by: 'CodeMaster',
-    upload_date: '2024-01-15T10:00:00Z',
+    user_id: 'user-1',
     views: 15420,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CodeMaster'
+    created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    profiles: {
+      username: 'CodeMaster',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CodeMaster'
+    }
   },
   {
     id: '2',
@@ -27,10 +31,14 @@ const mockVideos = [
     category: 'Technologia',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop',
-    uploaded_by: 'WebDev Pro',
-    upload_date: '2024-01-14T15:30:00Z',
+    user_id: 'user-2',
     views: 8932,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WebDevPro'
+    created_at: '2024-01-14T15:30:00Z',
+    updated_at: '2024-01-14T15:30:00Z',
+    profiles: {
+      username: 'WebDev Pro',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WebDevPro'
+    }
   },
   {
     id: '3',
@@ -39,10 +47,14 @@ const mockVideos = [
     category: 'Mobile',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=225&fit=crop',
-    uploaded_by: 'MobileDev',
-    upload_date: '2024-01-13T09:15:00Z',
+    user_id: 'user-3',
     views: 12856,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MobileDev'
+    created_at: '2024-01-13T09:15:00Z',
+    updated_at: '2024-01-13T09:15:00Z',
+    profiles: {
+      username: 'MobileDev',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MobileDev'
+    }
   },
   {
     id: '4',
@@ -51,10 +63,14 @@ const mockVideos = [
     category: 'AI',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=225&fit=crop',
-    uploaded_by: 'AI Guru',
-    upload_date: '2024-01-12T14:45:00Z',
+    user_id: 'user-4',
     views: 25743,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIGuru'
+    created_at: '2024-01-12T14:45:00Z',
+    updated_at: '2024-01-12T14:45:00Z',
+    profiles: {
+      username: 'AI Guru',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AIGuru'
+    }
   },
   {
     id: '5',
@@ -63,10 +79,14 @@ const mockVideos = [
     category: 'Bezpieczeństwo',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=225&fit=crop',
-    uploaded_by: 'CyberSec Expert',
-    upload_date: '2024-01-11T11:20:00Z',
+    user_id: 'user-5',
     views: 9876,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CyberSec'
+    created_at: '2024-01-11T11:20:00Z',
+    updated_at: '2024-01-11T11:20:00Z',
+    profiles: {
+      username: 'CyberSec Expert',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=CyberSec'
+    }
   },
   {
     id: '6',
@@ -75,10 +95,14 @@ const mockVideos = [
     category: 'DevOps',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
     thumbnail_url: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=225&fit=crop',
-    uploaded_by: 'DevOps Master',
-    upload_date: '2024-01-10T16:00:00Z',
+    user_id: 'user-6',
     views: 7432,
-    author_avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DevOpsMaster'
+    created_at: '2024-01-10T16:00:00Z',
+    updated_at: '2024-01-10T16:00:00Z',
+    profiles: {
+      username: 'DevOps Master',
+      avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=DevOpsMaster'
+    }
   }
 ];
 
